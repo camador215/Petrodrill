@@ -1,0 +1,31 @@
+{
+    "id": "64ebc43e-0da5-49e1-9b67-2a3334313ef9",
+    "name": "PetrodrillGratis",
+    "publisher": "camador",
+    "version": "1.0.0.0",
+    "brief": "",
+    "description": "",
+    "privacyStatement": "",
+    "EULA": "",
+    "help": "",
+    "url": "",
+    "logo": "",
+    "dependencies": [
+    ],
+    "screenshots": [],
+    "platform": "1.0.0.1",
+    "application": "28.1.49838.49886",
+    "idRanges": [
+        {
+            "from": 91100,
+            "to": 91199
+        }
+    ],
+    "resourceExposurePolicy": {
+        "allowDebugging": true,
+        "allowDownloadingSource": true,
+        "includeSourceInSymbolFile": true
+    },
+    "runtime": "15.0",
+    "features": ["TranslationFile", "GenerateCaptions"]
+}
