@@ -98,7 +98,8 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     Subscriber: Variant;
                     RecVar: Variant;
                     PreviewId: Guid;
-                    SalesHeader: Record "Sales Header";
+                    RecRef: RecordRef;
+                    CodeunitId: Integer;
                     SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
                 begin
                     PreviewId :=
@@ -109,15 +110,16 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     if IsNullGuid(PreviewId) then
                         Error('No existe un contexto de Preview activo.');
 
-                    SalesHeader.Copy(RecVar);
+                    if RecVar.IsRecord() then
+                        RecRef.GetTable(RecVar);
 
-                    if SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice then
-                        Error(
-                            'El documento %1 no es una factura de venta.',
-                            SalesHeader."No.");
+                    CodeunitId := GetPostingCodeunit(RecRef);
 
-                    // Ejecutar el mismo codeunit estándar utilizado por el botón Registrar/Post.
-                    SalesPostYesNo.Run(SalesHeader);
+                    if CodeunitId = 0 then
+                        Error('No existe un Codeunit configurado para la tabla %1.', RecRef.Caption());
+
+                    if Codeunit.Run(CodeunitId, RecVar) then
+                        CurrPage.Close();
                 end;
             }
         }
@@ -152,5 +154,25 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                 TotalDebeACY += GLEntry."Add.-Currency Debit Amount";
                 TotalHaberACY += GLEntry."Add.-Currency Credit Amount";
             until GLEntry.Next() = 0;
+    end;
+
+    local procedure GetPostingCodeunit(RecRef: RecordRef): Integer
+    begin
+        case RecRef.Number() of
+            Database::"Sales Header":
+                exit(Codeunit::"Sales-Post (Yes/No)");
+
+            Database::"Purchase Header":
+                exit(Codeunit::"Purch.-Post (Yes/No)");
+
+            Database::"Gen. Journal Line",
+            Database::"Item Journal Line":
+                exit(Codeunit::"Gen. Jnl.-Post");
+
+            Database::"FA Journal Line":
+                exit(Codeunit::"FA. Jnl.-Post");
+        end;
+
+        exit(0);
     end;
 }
