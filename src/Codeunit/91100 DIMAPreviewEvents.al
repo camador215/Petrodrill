@@ -3,7 +3,7 @@ codeunit 91100 "DIMA Preview Events"
     [EventSubscriber(
         ObjectType::Codeunit,
         Codeunit::"Gen. Jnl.-Post Preview",
-        'OnBeforeRunPreview',
+        OnBeforeRunPreview,
         '',
         false,
         false)]
