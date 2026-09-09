@@ -36,12 +36,16 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = true;
+                        CaptionClass = GetCaptionWithCurrencyCode('Total importe debe', '');
+                        ToolTip = 'Especifica la suma del valor del campo "Importe debe" en todas las líneas de esta vista previa.';
                     }
                     field("Total Debe div.-adic."; TotalDebeACY)
                     {
                         ApplicationArea = All;
                         Editable = false;
-                        Visible = true;
+                        CaptionClass = GetCaptionWithCurrencyCode('Total debe div.-adic.', 'ACY');
+                        Visible = ShowTotalACY;
+                        ToolTip = 'Especifica la suma del valor del campo "Importe debe" de todas las líneas de esta vista previa, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                     }
                 }
 
@@ -54,12 +58,16 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = true;
+                        CaptionClass = GetCaptionWithCurrencyCode('Total importe haber', '');
+                        ToolTip = 'Especifica la suma del valor del campo "Importe haber" en todas las líneas de esta vista previa.';
                     }
                     field("Total haber div.-adic."; TotalHaberACY)
                     {
                         ApplicationArea = All;
                         Editable = false;
-                        Visible = true;
+                        CaptionClass = GetCaptionWithCurrencyCode('Total haber div.-adic.', 'ACY');
+                        Visible = ShowTotalACY;
+                        ToolTip = 'Especifica la suma del valor del campo "Importe haber" de todas las líneas de esta vista previa, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                     }
                 }
             }
@@ -115,6 +123,8 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
     }
     trigger OnOpenPage()
     begin
+        GLSetup.Get();
+        ShowTotalsACY();
         CalculateTotals();
     end;
 
@@ -123,6 +133,8 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
         TotalHaberLCY: Decimal;
         TotalDebeACY: Decimal;
         TotalHaberACY: Decimal;
+        ShowTotalACY: Boolean;
+        GLSetup: Record "General Ledger Setup";
 
 
     local procedure CalculateTotals()
@@ -152,21 +164,21 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                 if CurrencyTotals <> '' then begin
                     if GLEntry."Amount" > 0 then
                         TotalDebeACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                            WorkDate(),
+                            GLEntry."Posting Date",
                             CurrencyTotals,
                             GLEntry."Amount",
                             CurrencyExchangeRate.ExchangeRate(
-                                WorkDate(),
+                                GLEntry."Posting Date",
                                 CurrencyTotals
                             )
                         )
                     else
                         TotalHaberACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                                WorkDate(),
+                                GLEntry."Posting Date",
                                 CurrencyTotals,
                                 Abs(GLEntry."Amount"),
                                 CurrencyExchangeRate.ExchangeRate(
-                                    WorkDate(),
+                                    GLEntry."Posting Date",
                                     CurrencyTotals
                                 )
                             )
@@ -177,6 +189,26 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         TotalHaberACY += Abs(GLEntry."Amount");
                 end;
             until GLEntry.Next() = 0;
+    end;
+
+    local procedure GetCaptionWithCurrencyCode(CaptionWithoutCurrencyCode: Text; CurrencyCode: Text): Text
+    begin
+        if CurrencyCode = '' then
+            CurrencyCode := GLSetup.GetCurrencyCode(CurrencyCode)
+        else
+            CurrencyCode := GLSetup."Totals Currency Code";
+
+        if CurrencyCode <> '' then
+            exit(CaptionWithoutCurrencyCode + StrSubstNo(' (%1)', CurrencyCode));
+
+        exit(CaptionWithoutCurrencyCode);
+    end;
+
+    local procedure ShowTotalsACY()
+    var
+        CurrencyACY: Code[10];
+    begin
+        ShowTotalACY := GLSetup."Totals Currency Code" <> '';
     end;
 
     local procedure GetPostingCodeunit(RecRef: RecordRef): Integer

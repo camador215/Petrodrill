@@ -39,12 +39,16 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = true;
+                    CaptionClass = GetCaptionWithCurrencyCode('Total importe debe', '');
+                    ToolTip = 'Especifica la suma del valor del campo "Importe debe" en todas las líneas del documento.';
                 }
                 field("Total importe haber"; TotalHaber)
                 {
                     ApplicationArea = All;
                     Editable = false;
                     Visible = true;
+                    CaptionClass = GetCaptionWithCurrencyCode('Total importe haber', '');
+                    ToolTip = 'Especifica la suma del valor del campo "Importe haber" en todas las líneas del documento.';
                 }
             }
             group(TotalesACY)
@@ -54,13 +58,17 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    Visible = true;
+                    CaptionClass = GetCaptionWithCurrencyCode('Total debe div.-adic.', 'ACY');
+                    Visible = ShowTotalACY;
+                    ToolTip = 'Especifica la suma del valor del campo "Importe debe" de todas las líneas del documento, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                 }
                 field("Total Haber div.-adic."; TotalHaberACY)
                 {
                     ApplicationArea = All;
                     Editable = false;
-                    Visible = true;
+                    CaptionClass = GetCaptionWithCurrencyCode('Total haber div.-adic.', 'ACY');
+                    Visible = ShowTotalACY;
+                    ToolTip = 'Especifica la suma del valor del campo "Importe haber" de todas las líneas del documento, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                 }
             }
 
@@ -68,6 +76,8 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
     }
     trigger OnOpenPage()
     begin
+        GLSetup.Get();
+        ShowTotalsACY();
         CalculateTotals();
     end;
 
@@ -98,12 +108,13 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
         TotalHaber: Decimal;
         TotalDebeACY: Decimal;
         TotalHaberACY: Decimal;
+        ShowTotalACY: Boolean;
+        GLSetup: Record "General Ledger Setup";
 
 
     local procedure CalculateTotals()
     var
         GLJournalLine: Record "Gen. Journal Line";
-        GLSetup: Record "General Ledger Setup";
         CurrencyTotals: Code[10];
         CurrencyExchangeRate: Record "Currency Exchange Rate";
     begin
@@ -113,7 +124,6 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
         TotalHaberACY := 0;
 
         GLJournalLine.Copy(Rec, false);
-        GLSetup.Get();
         CurrencyTotals := GLSetup."Totals Currency Code";
 
         if GLJournalLine.FindSet() then
@@ -126,21 +136,21 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                 if CurrencyTotals <> '' then begin
                     if GLJournalLine."Amount (LCY)" > 0 then
                         TotalDebeACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                            WorkDate(),
+                            GLJournalLine."Posting Date",
                             CurrencyTotals,
                             GLJournalLine."Amount (LCY)",
                             CurrencyExchangeRate.ExchangeRate(
-                                WorkDate(),
+                                GLJournalLine."Posting Date",
                                 CurrencyTotals
                             )
                         )
                     else
                         TotalHaberACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
-                                WorkDate(),
+                                GLJournalLine."Posting Date",
                                 CurrencyTotals,
                                 Abs(GLJournalLine."Amount (LCY)"),
                                 CurrencyExchangeRate.ExchangeRate(
-                                    WorkDate(),
+                                    GLJournalLine."Posting Date",
                                     CurrencyTotals
                                 )
                             )
@@ -152,5 +162,25 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                 end;
 
             until GLJournalLine.Next() = 0;
+    end;
+
+    local procedure GetCaptionWithCurrencyCode(CaptionWithoutCurrencyCode: Text; CurrencyCode: Text): Text
+    begin
+        if CurrencyCode = '' then
+            CurrencyCode := GLSetup.GetCurrencyCode(CurrencyCode)
+        else
+            CurrencyCode := GLSetup."Totals Currency Code";
+
+        if CurrencyCode <> '' then
+            exit(CaptionWithoutCurrencyCode + StrSubstNo(' (%1)', CurrencyCode));
+
+        exit(CaptionWithoutCurrencyCode);
+    end;
+
+    local procedure ShowTotalsACY()
+    var
+        CurrencyACY: Code[10];
+    begin
+        ShowTotalACY := GLSetup."Totals Currency Code" <> '';
     end;
 }
