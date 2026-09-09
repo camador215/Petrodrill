@@ -2,35 +2,24 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
 {
     layout
     {
-        addafter(Amount)
+        modify(Amount)
         {
-            field("Debe LCY"; Rec."Debit Amount")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                Visible = true;
-            }
+            visible = false;
+        }
+        modify("Source Currency Amount")
+        {
+            visible = false;
+        }
+        modify("Debit Amount")
+        {
+            Editable = false;
+            Visible = true;
+        }
 
-            field("Haber LCY"; Rec."Credit Amount")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                Visible = true;
-            }
-
-            field("Debe ACY"; Rec."Add.-Currency Debit Amount")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                Visible = true;
-            }
-
-            field("Haber ACY"; Rec."Add.-Currency Credit Amount")
-            {
-                ApplicationArea = All;
-                Editable = false;
-                Visible = true;
-            }
+        modify("Credit Amount")
+        {
+            Editable = false;
+            Visible = true;
         }
         addafter(Control1)
         {
@@ -139,6 +128,9 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
     local procedure CalculateTotals()
     var
         GLEntry: Record "G/L Entry" temporary;
+        GLSetup: Record "General Ledger Setup";
+        CurrencyTotals: Code[10];
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
     begin
         TotalDebeLCY := 0;
         TotalHaberLCY := 0;
@@ -147,12 +139,43 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
 
         GLEntry.Copy(Rec, true);
 
+        GLSetup.Get();
+        CurrencyTotals := GLSetup."Totals Currency Code";
+
         if GLEntry.FindSet() then
             repeat
-                TotalDebeLCY += GLEntry."Debit Amount";
-                TotalHaberLCY += GLEntry."Credit Amount";
-                TotalDebeACY += GLEntry."Add.-Currency Debit Amount";
-                TotalHaberACY += GLEntry."Add.-Currency Credit Amount";
+                if GLEntry."Amount" > 0 then
+                    TotalDebeLCY += GLEntry."Amount"
+                else
+                    TotalHaberLCY += Abs(GLEntry."Amount");
+
+                if CurrencyTotals <> '' then begin
+                    if GLEntry."Amount" > 0 then
+                        TotalDebeACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
+                            WorkDate(),
+                            CurrencyTotals,
+                            GLEntry."Amount",
+                            CurrencyExchangeRate.ExchangeRate(
+                                WorkDate(),
+                                CurrencyTotals
+                            )
+                        )
+                    else
+                        TotalHaberACY += CurrencyExchangeRate.ExchangeAmtLCYToFCY(
+                                WorkDate(),
+                                CurrencyTotals,
+                                Abs(GLEntry."Amount"),
+                                CurrencyExchangeRate.ExchangeRate(
+                                    WorkDate(),
+                                    CurrencyTotals
+                                )
+                            )
+                end else begin
+                    if GLEntry."Amount" > 0 then
+                        TotalDebeACY += GLEntry."Amount"
+                    else
+                        TotalHaberACY += Abs(GLEntry."Amount");
+                end;
             until GLEntry.Next() = 0;
     end;
 
