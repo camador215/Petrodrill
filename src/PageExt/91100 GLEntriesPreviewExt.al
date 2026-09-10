@@ -97,7 +97,6 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     PreviewId: Guid;
                     RecRef: RecordRef;
                     CodeunitId: Integer;
-                    SalesPostYesNo: Codeunit "Sales-Post (Yes/No)";
                 begin
                     PreviewId :=
                         PreviewContext.GetContext(
@@ -115,8 +114,10 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     if CodeunitId = 0 then
                         Error('No existe un Codeunit configurado para la tabla %1.', RecRef.Caption());
 
-                    if Codeunit.Run(CodeunitId, RecVar) then
+                    if Codeunit.Run(CodeunitId, RecVar) then begin
+                        PreviewContext.RequestRegister();
                         CurrPage.Close();
+                    end;
                 end;
             }
         }
