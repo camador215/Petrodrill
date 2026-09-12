@@ -114,10 +114,15 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     if CodeunitId = 0 then
                         Error('No existe un Codeunit configurado para la tabla %1.', RecRef.Caption());
 
-                    if Codeunit.Run(CodeunitId, RecVar) then begin
-                        PreviewContext.RequestRegister();
+                    Codeunit.Run(CodeunitId, RecVar);
+
+                    if PreviewContext.IsRegisterRequested() then
                         CurrPage.Close();
-                    end;
+
+                    // if Codeunit.Run(CodeunitId, RecVar) then begin
+                    //     PreviewContext.RequestRegister();
+                    //     CurrPage.Close();
+                    // end;
                 end;
             }
         }

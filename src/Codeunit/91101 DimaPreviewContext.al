@@ -50,4 +50,40 @@ codeunit 91101 "DIMA Preview Context"
     begin
         exit(not IsNullGuid(PreviewId));
     end;
+
+    [EventSubscriber(
+        ObjectType::Codeunit,
+        Codeunit::"Gen. Jnl.-Post",
+        OnCodeOnAfterGenJnlPostBatchRun,
+        '',
+        false,
+        false)]
+    local procedure OnCodeOnAfterGenJnlPostBatchRun(var GenJnlLine: Record "Gen. Journal Line")
+    begin
+        RequestRegister();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit,
+                     Codeunit::"Purch.-Post",
+                     OnAfterPostPurchaseDoc,
+                     '',
+                     false,
+                     false)]
+    local procedure OnAfterPostPurchaseDoc(
+        PurchaseHeader: Record "Purchase Header")
+    begin
+        RequestRegister();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit,
+                     Codeunit::"Sales-Post",
+                     OnAfterPostSalesDoc,
+                     '',
+                     false,
+                     false)]
+    local procedure OnAfterPostSalesDoc(
+        SalesHeader: Record "Sales Header")
+    begin
+        RequestRegister();
+    end;
 }
