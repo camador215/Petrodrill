@@ -2,7 +2,7 @@ pageextension 91105 "DIMA General Ledger Setup Ext" extends "General Ledger Setu
 {
     layout
     {
-        addafter("Electronic Invoice")
+        addlast(content)
         {
             group("DIMA General Ledger Setup")
             {
