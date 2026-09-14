@@ -37,6 +37,7 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         Editable = false;
                         Visible = true;
                         CaptionClass = GetCaptionWithCurrencyCode('Total importe debe', '');
+                        DecimalPlaces = 2 : 2;
                         ToolTip = 'Especifica la suma del valor del campo "Importe debe" en todas las líneas de esta vista previa.';
                     }
                     field("Total Debe div.-adic."; TotalDebeACY)
@@ -45,6 +46,7 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         Editable = false;
                         CaptionClass = GetCaptionWithCurrencyCode('Total debe div.-adic.', 'ACY');
                         Visible = ShowTotalACY;
+                        DecimalPlaces = 2 : 2;
                         ToolTip = 'Especifica la suma del valor del campo "Importe debe" de todas las líneas de esta vista previa, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                     }
                 }
@@ -59,6 +61,7 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         Editable = false;
                         Visible = true;
                         CaptionClass = GetCaptionWithCurrencyCode('Total importe haber', '');
+                        DecimalPlaces = 2 : 2;
                         ToolTip = 'Especifica la suma del valor del campo "Importe haber" en todas las líneas de esta vista previa.';
                     }
                     field("Total haber div.-adic."; TotalHaberACY)
@@ -67,6 +70,7 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         Editable = false;
                         CaptionClass = GetCaptionWithCurrencyCode('Total haber div.-adic.', 'ACY');
                         Visible = ShowTotalACY;
+                        DecimalPlaces = 2 : 2;
                         ToolTip = 'Especifica la suma del valor del campo "Importe haber" de todas las líneas de esta vista previa, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                     }
                 }

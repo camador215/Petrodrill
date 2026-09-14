@@ -40,6 +40,7 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                     Editable = false;
                     Visible = true;
                     CaptionClass = GetCaptionWithCurrencyCode('Total importe debe', '');
+                    DecimalPlaces = 2 : 2;
                     ToolTip = 'Especifica la suma del valor del campo "Importe debe" en todas las líneas del documento.';
                 }
                 field("Total importe haber"; TotalHaber)
@@ -47,6 +48,7 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                     ApplicationArea = All;
                     Editable = false;
                     Visible = true;
+                    DecimalPlaces = 2 : 2;
                     CaptionClass = GetCaptionWithCurrencyCode('Total importe haber', '');
                     ToolTip = 'Especifica la suma del valor del campo "Importe haber" en todas las líneas del documento.';
                 }
@@ -60,6 +62,7 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                     Editable = false;
                     CaptionClass = GetCaptionWithCurrencyCode('Total debe div.-adic.', 'ACY');
                     Visible = ShowTotalACY;
+                    DecimalPlaces = 2 : 2;
                     ToolTip = 'Especifica la suma del valor del campo "Importe debe" de todas las líneas del documento, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                 }
                 field("Total Haber div.-adic."; TotalHaberACY)
@@ -68,6 +71,7 @@ pageextension 91101 "DIMA General Journal" extends "General Journal"
                     Editable = false;
                     CaptionClass = GetCaptionWithCurrencyCode('Total haber div.-adic.', 'ACY');
                     Visible = ShowTotalACY;
+                    DecimalPlaces = 2 : 2;
                     ToolTip = 'Especifica la suma del valor del campo "Importe haber" de todas las líneas del documento, expresada en la divisa definida en Configuración de contabilidad, en el grupo Movs. contabilidad.';
                 }
             }

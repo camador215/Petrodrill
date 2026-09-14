@@ -17,7 +17,7 @@ pageextension 91102 "Value Entries Ext" extends "Value Entries"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = true;
-                        DecimalPlaces = 0 : 2;
+                        DecimalPlaces = 2 : 2;
                     }
                 }
 
@@ -30,7 +30,7 @@ pageextension 91102 "Value Entries Ext" extends "Value Entries"
                         ApplicationArea = All;
                         Editable = false;
                         Visible = true;
-                        DecimalPlaces = 0 : 2;
+                        DecimalPlaces = 2 : 2;
                     }
                 }
             }
