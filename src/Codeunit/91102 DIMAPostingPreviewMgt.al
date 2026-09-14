@@ -1,5 +1,8 @@
 codeunit 91104 "DIMA Posting Preview Mgt."
 {
+    //Este codeunit permite recuperar el codeunit "Posting Preview Event Handler"
+    //que contiene todas las entradas y registros para ver la vista previa.
+    //Sin esto no es posible cerrar consecutivamente las paginas 122 y 115
     SingleInstance = true;
 
     var

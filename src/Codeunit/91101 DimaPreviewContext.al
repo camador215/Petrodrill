@@ -1,5 +1,7 @@
 codeunit 91101 "DIMA Preview Context"
 {
+    //Este codeunit sirve para guardar y retornar el documento que 
+    //se está previsualizando.
     SingleInstance = true;
 
     var
@@ -8,6 +10,9 @@ codeunit 91101 "DIMA Preview Context"
         RecVar: Variant;
         RegisterRequested: Boolean;
 
+    //Guarda el codeunit en NewSubscriber
+    //Guarda el documento en NewRecVar
+    //antes de continuar la previsualización.
     procedure SetContext(
         NewSubscriber: Variant;
         NewRecVar: Variant)
@@ -18,6 +23,7 @@ codeunit 91101 "DIMA Preview Context"
         RegisterRequested := false;
     end;
 
+    //Retorna el contexto almacenado por SetContext
     procedure GetContext(
         var OutSubscriber: Variant;
         var OutRecVar: Variant): Guid
@@ -28,6 +34,10 @@ codeunit 91101 "DIMA Preview Context"
         exit(PreviewId);
     end;
 
+    //RegisterRequested es usada para consultar si las
+    //page 122 y 115 deben cerrarse consecutivamente.
+    //true = deben cerrarse consecutivamente.
+    //false = deben cerrarse consecutivamente.
     procedure RequestRegister()
     begin
         RegisterRequested := true;
@@ -38,6 +48,7 @@ codeunit 91101 "DIMA Preview Context"
         exit(RegisterRequested);
     end;
 
+    //ClearContext() se usa cuando se genera una nueva vista previa.
     procedure ClearContext()
     begin
         Clear(PreviewId);
@@ -46,11 +57,15 @@ codeunit 91101 "DIMA Preview Context"
         RegisterRequested := false;
     end;
 
+    //Se asigna un codigo único al contexto para no generar errores.
     procedure HasContext(): Boolean
     begin
         exit(not IsNullGuid(PreviewId));
     end;
 
+    //Este evento permite saber si un usuario confirmó
+    //registrar un diario general.
+    //Es util para saber si las pages 122 y 115 deben cerrarse consecutivamente.
     [EventSubscriber(
         ObjectType::Codeunit,
         Codeunit::"Gen. Jnl.-Post",
@@ -63,6 +78,9 @@ codeunit 91101 "DIMA Preview Context"
         RequestRegister();
     end;
 
+    //Este evento permite saber si un usuario confirmó
+    //registrar una factura de compra.
+    //Es util para saber si las pages 122 y 115 deben cerrarse consecutivamente.
     [EventSubscriber(ObjectType::Codeunit,
                      Codeunit::"Purch.-Post",
                      OnAfterPostPurchaseDoc,
@@ -75,6 +93,9 @@ codeunit 91101 "DIMA Preview Context"
         RequestRegister();
     end;
 
+    //Este evento permite saber si un usuario confirmó
+    //registrar una factura de venta.
+    //Es util para saber si las pages 122 y 115 deben cerrarse consecutivamente.
     [EventSubscriber(ObjectType::Codeunit,
                      Codeunit::"Sales-Post",
                      OnAfterPostSalesDoc,
