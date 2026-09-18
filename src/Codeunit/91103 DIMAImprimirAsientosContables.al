@@ -15,10 +15,10 @@ codeunit 91103 "DIMA Imp. Asientos Contables"
         RecRef.SetTable(ItemJournalLine);
 
         case ItemJournalLine."Source Code" of
-            'RECLAS.JNL':
+            'RECLASSJNL':
                 RegistrarDiarioReclasificacionProducto(ItemJournalLine);
 
-            'DIAPRODS':
+            'ITEMJNL':
                 RegistrarDiarioProducto(ItemJournalLine);
         end;
     end;
@@ -76,6 +76,33 @@ codeunit 91103 "DIMA Imp. Asientos Contables"
         if docNoImpresos.FindSet() then begin
 
             reporte.ColocarNroDocumentoCodigoOrigenCodAuditoria(docNoImpresos.CodigoOrigen, docNoImpresos.CodigoAuditoria, false);
+
+            reporte.UseRequestPage(false);
+
+            reporte.Run();
+
+            docNoImpresos.ModifyAll(Impreso, true);
+
+        end;
+    end;
+
+    local procedure RegistroDiarioPago(var Rec: Record "Gen. Journal Line")
+    var
+        reporte: Report DIMA_ComprContableDiarios;
+        docNoImpresos: Record DIMA_DocContabilizadosImpresos;
+        pago: Record "Gen. Journal Line";
+    begin
+
+        pago := Rec;
+
+        docNoImpresos.Reset();
+        docNoImpresos.SetRange(Impreso, false);
+        docNoImpresos.SetRange(CodigoDiario, pago."Journal Batch Name");
+        docNoImpresos.SetRange(CodigoOrigen, pago."Source Code");
+
+        if docNoImpresos.FindSet() then begin
+
+            reporte.ColocarNroDocumentoCodigoOrigenCodDiario(docNoImpresos.CodigoOrigen, docNoImpresos.CodigoDiario, false);
 
             reporte.UseRequestPage(false);
 
