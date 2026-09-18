@@ -2,7 +2,7 @@
     "id": "64ebc43e-0da5-49e1-9b67-2a3334313ef9",
     "name": "Petrodrill",
     "publisher": "DIMA LTDA",
-    "version": "1.0.0.10",
+    "version": "1.0.0.11",
     "brief": "",
     "description": "",
     "privacyStatement": "",
@@ -11,10 +11,16 @@
     "url": "",
     "logo": "",
     "dependencies": [
+        {
+            "id": "7ef7867a-50fa-47aa-bc40-f00b43e2de91",
+            "publisher": "DIMA",
+            "version": "1.0.0.75",
+            "name": "REPORTES CONTABLES"
+        }
     ],
     "screenshots": [],
-    "platform": "1.0.0.1",
-    "application": "28.1.49838.49886",
+    "platform": "1.0.0.0",
+    "application": "25.0.0.0",
     "idRanges": [
         {
             "from": 91100,
@@ -22,10 +28,10 @@
         }
     ],
     "resourceExposurePolicy": {
-        "allowDebugging": true,
-        "allowDownloadingSource": true,
+        "allowDebugging": false,
+        "allowDownloadingSource": false,
         "includeSourceInSymbolFile": true
     },
-    "runtime": "15.0",
+    "runtime": "14.0",
     "features": ["TranslationFile", "GenerateCaptions"]
 }

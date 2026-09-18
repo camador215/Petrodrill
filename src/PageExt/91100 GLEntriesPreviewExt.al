@@ -91,7 +91,8 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                 Image = PostOrder;
                 Promoted = true;
                 PromotedCategory = Process;
-                ToolTip = 'Registra el documento que originó esta previsualización.';
+                // Enabled = false;
+                ToolTip = '(En Mantenimiento...). Registra el documento que originó esta previsualización.';
 
                 trigger OnAction()
                 var
@@ -101,6 +102,7 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     PreviewId: Guid;
                     RecRef: RecordRef;
                     CodeunitId: Integer;
+                    ImpAsientosContables: Codeunit "DIMA Imp. Asientos Contables";
                 begin
                     PreviewId :=
                         PreviewContext.GetContext(
@@ -119,6 +121,11 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                         Error('No existe un Codeunit configurado para la tabla %1.', RecRef.Caption());
 
                     Codeunit.Run(CodeunitId, RecVar);
+
+                    if CodeunitId = Codeunit::"Item Jnl.-Post" then begin
+                        PreviewContext.RequestRegister();
+                        ImpAsientosContables.ImprimirAsientoContable(RecRef);
+                    end;
 
                     if PreviewContext.IsRegisterRequested() then
                         CurrPage.Close();
@@ -230,9 +237,11 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
             Database::"Purchase Header":
                 exit(Codeunit::"Purch.-Post (Yes/No)");
 
-            Database::"Gen. Journal Line",
-            Database::"Item Journal Line":
+            Database::"Gen. Journal Line":
                 exit(Codeunit::"Gen. Jnl.-Post");
+
+            Database::"Item Journal Line":
+                exit(Codeunit::"Item Jnl.-Post");
 
             Database::"FA Journal Line":
                 exit(Codeunit::"FA. Jnl.-Post");
