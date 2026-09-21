@@ -87,12 +87,12 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
             action(DIMARegister)
             {
                 ApplicationArea = All;
-                Caption = 'Registrar';
-                Image = PostOrder;
+                Caption = 'Registrar e Imprimir';
+                Image = PostPrint;
                 Promoted = true;
                 PromotedCategory = Process;
                 // Enabled = false;
-                ToolTip = '(En Mantenimiento...). Registra el documento que originó esta previsualización.';
+                ToolTip = 'Registra el documento que originó esta previsualización.';
 
                 trigger OnAction()
                 var
@@ -103,6 +103,8 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
                     RecRef: RecordRef;
                     CodeunitId: Integer;
                     ImpAsientosContables: Codeunit "DIMA Imp. Asientos Contables";
+                    WarehouseReceiptHeader: Record "Warehouse Receipt Header";
+                    WarehouseReceiptLine: Record "Warehouse Receipt Line";
                 begin
                     PreviewId :=
                         PreviewContext.GetContext(
@@ -122,10 +124,13 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
 
                     Codeunit.Run(CodeunitId, RecVar);
 
-                    if CodeunitId = Codeunit::"Item Jnl.-Post" then begin
-                        PreviewContext.RequestRegister();
-                        ImpAsientosContables.ImprimirAsientoContable(RecRef);
+                    case CodeunitId of
+                        Codeunit::"Item Jnl.-Post",
+                        Codeunit::"Whse.-Post Receipt (Yes/No)":
+                            PreviewContext.RequestRegister();
                     end;
+
+                    ImpAsientosContables.ImprimirAsientoContable(RecRef);
 
                     if PreviewContext.IsRegisterRequested() then
                         CurrPage.Close();
@@ -245,6 +250,9 @@ pageextension 91100 "DIMA G/L Entries Preview" extends "G/L Entries Preview"
 
             Database::"FA Journal Line":
                 exit(Codeunit::"FA. Jnl.-Post");
+
+            Database::"Warehouse Receipt Line":
+                exit(Codeunit::"Whse.-Post Receipt (Yes/No)");
         end;
 
         exit(0);
